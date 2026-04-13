@@ -4,38 +4,35 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Make sure to replace this URL with your actual GitHub repo URL
+                // Ensure this URL perfectly matches your GitHub repository
                 git branch: 'main', url: 'https://github.com/nitin-projects/SIT-223-Task8.2C---DevSecOps.git'
             }
         }
         
         stage('Install Dependencies') {
             steps {
-                // Windows users: change 'sh' to 'bat'
-                sh 'npm install'
+                // Using 'bat' because Jenkins is running on Windows
+                bat 'npm install'
             }
         }
         
         stage('Run Tests') {
             steps {
-                // The '|| true' ensures the pipeline continues even if tests fail
-                // Windows users: change 'sh' to 'bat' and '|| true' to '|| exit /b 0'
-                sh 'npm test || true'
+                // 'exit /b 0' forces the step to succeed even if tests fail, allowing the pipeline to continue
+                bat 'npm test || exit /b 0'
             }
         }
         
         stage('Generate Coverage Report') {
             steps {
-                // Windows users: change 'sh' to 'bat' and '|| true' to '|| exit /b 0'
-                sh 'npm run coverage || true'
+                bat 'npm run coverage || exit /b 0'
             }
         }
         
         stage('NPM Audit (Security Scan)') {
             steps {
-                // This is where the vulnerabilities are found
-                // Windows users: change 'sh' to 'bat' and '|| true' to '|| exit /b 0'
-                sh 'npm audit || true'
+                // This step performs the security audit
+                bat 'npm audit || exit /b 0'
             }
         }
     }
