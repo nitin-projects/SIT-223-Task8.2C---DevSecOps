@@ -4,7 +4,6 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Ensure this URL perfectly matches your GitHub repository
                 git branch: 'main', url: 'https://github.com/nitin-projects/SIT-223-Task8.2C---DevSecOps.git'
             }
         }
