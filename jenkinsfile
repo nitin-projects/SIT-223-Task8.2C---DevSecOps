@@ -9,29 +9,26 @@ pipeline {
         }
         
         stage('Install Dependencies') {
-            steps {
-                // Using 'bat' because Jenkins is running on Windows
-                bat 'npm install'
-            }
+            steps { bat 'npm install' }
         }
         
         stage('Run Tests') {
-            steps {
-                // 'exit /b 0' forces the step to succeed even if tests fail, allowing the pipeline to continue
-                bat 'npm test || exit /b 0'
-            }
+            steps { bat 'npm test || exit /b 0' }
         }
         
         stage('Generate Coverage Report') {
-            steps {
-                bat 'npm run coverage || exit /b 0'
-            }
+            steps { bat 'npm run coverage || exit /b 0' }
         }
         
         stage('NPM Audit (Security Scan)') {
+            steps { bat 'npm audit || exit /b 0' }
+        }
+        
+        stage('SonarCloud Analysis') {
             steps {
-                // This step performs the security audit
-                bat 'npm audit || exit /b 0'
+                withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+                    bat 'npx sonarqube-scanner -Dsonar.login="%SONAR_TOKEN%"'
+                }
             }
         }
     }
