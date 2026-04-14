@@ -1,54 +1,38 @@
 pipeline {
     agent any
+
     stages {
         stage('Checkout') {
             steps {
-                echo 'Tool: Git'
+                // Ensure this URL perfectly matches your GitHub repository
                 git branch: 'main', url: 'https://github.com/nitin-projects/SIT-223-Task8.2C---DevSecOps.git'
             }
         }
+        
         stage('Install Dependencies') {
             steps {
-                echo 'Tool: npm (Node Package Manager)'
+                // Using 'bat' because Jenkins is running on Windows
                 bat 'npm install'
             }
         }
+        
         stage('Run Tests') {
             steps {
-                echo 'Tool: Mocha / Snyk (via npm test)'
+                // 'exit /b 0' forces the step to succeed even if tests fail, allowing the pipeline to continue
                 bat 'npm test || exit /b 0'
             }
-            post {
-                always {
-                    emailext(
-                        subject: "Jenkins Stage Status: Run Tests - ${currentBuild.currentResult}",
-                        body: "The Run Tests stage has completed. Please see the attached logs for details.",
-                        to: "gillnitin286@gmail.com",
-                        attachLog: true
-                    )
-                }
-            }
         }
+        
         stage('Generate Coverage Report') {
             steps {
-                echo 'Tool: Istanbul / nyc'
                 bat 'npm run coverage || exit /b 0'
             }
         }
+        
         stage('NPM Audit (Security Scan)') {
             steps {
-                echo 'Tool: npm audit'
+                // This step performs the security audit
                 bat 'npm audit || exit /b 0'
-            }
-            post {
-                always {
-                    emailext(
-                        subject: "Jenkins Stage Status: Security Scan - ${currentBuild.currentResult}",
-                        body: "The Security Scan stage has completed. Please see the attached logs for details.",
-                        to: "gillnitin286@gmail.com",
-                        attachLog: true
-                    )
-                }
             }
         }
     }
